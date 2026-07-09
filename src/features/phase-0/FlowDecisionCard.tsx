@@ -12,9 +12,10 @@ type FlowDecision = {
   missingInfo: string[];
   whyBlocked: string[];
   nextStepAdvice: string[];
+  availableIfAllEvidencePasses: boolean;
 };
 
-function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
+export function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
   const hasLocationSignal = /(地址|位置|出口|集合點|老街|車站|學校|路口|活動中心|溪畔|光復|大進路口)/i.test(
     record.rawText,
   );
@@ -24,17 +25,19 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
   const hasContactSignal = /(聯絡|電話|來電|志工|報到|值守)/i.test(record.rawText);
 
   if (record.verificationStatus === "unverified") {
+    const evidence = [
+      { label: "保留原始資訊與來源", hasInfo: true },
+      { label: "位置線索", hasInfo: hasLocationSignal },
+      { label: "需求線索", hasInfo: hasNeedSignal },
+    ];
+
     return {
       statusLabel: "候選任務卡（待查核）",
       stageLabel: "待查核階段",
       detail: "待查核，不代表可派遣",
       nextStep: "由人類確認是否進入候選池",
       canActDirectly: false,
-      evidence: [
-        { label: "保留原始資訊與來源", hasInfo: true },
-        { label: "位置線索", hasInfo: hasLocationSignal },
-        { label: "需求線索", hasInfo: hasNeedSignal },
-      ],
+      evidence,
       blockers: [
         "來源未查核，例如社群轉錄、口頭轉述或未確認公告",
         "不應自動轉為派工任務，需先由人確認後再決定",
@@ -52,22 +55,25 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
         "先補查來源與現場狀況",
         "確認位置、需求與聯絡方式後再判斷",
       ],
+      availableIfAllEvidencePasses: false,
     };
   }
 
   if (record.verificationStatus === "needs_review") {
+    const evidence = [
+      { label: "保留原始資訊與時間戳", hasInfo: true },
+      { label: "位置線索", hasInfo: hasLocationSignal },
+      { label: "需求內容", hasInfo: hasNeedSignal },
+      { label: "聯絡或報到線索", hasInfo: hasContactSignal },
+    ];
+
     return {
       statusLabel: "需要人工確認",
       stageLabel: "待人工確認階段",
       detail: "關鍵欄位仍需人工判斷，不能直接當成可執行任務",
       nextStep: "先保留原始資訊，再由人類補查",
       canActDirectly: false,
-      evidence: [
-        { label: "保留原始資訊與時間戳", hasInfo: true },
-        { label: "位置線索", hasInfo: hasLocationSignal },
-        { label: "需求內容", hasInfo: hasNeedSignal },
-        { label: "聯絡或報到線索", hasInfo: hasContactSignal },
-      ],
+      evidence,
       blockers: [
         "關鍵欄位仍需人工確認",
         "不應自動轉為派工任務，需先由人確認後再決定",
@@ -85,8 +91,15 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
         "先由人確認關鍵欄位後再決定",
         "若必要，補查現場與來源後再進入候選池",
       ],
+      availableIfAllEvidencePasses: evidence.every((item) => item.hasInfo),
     };
   }
+
+  const evidence = [
+    { label: "已保留原始資訊", hasInfo: true },
+    { label: "已完成人工確認", hasInfo: true },
+    { label: "已附上審核紀錄", hasInfo: true },
+  ];
 
   return {
     statusLabel: "已驗證可執行",
@@ -94,15 +107,12 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
     detail: "已通過人類確認，並保留審核紀錄",
     nextStep: "可進入後續任務流程",
     canActDirectly: true,
-    evidence: [
-      { label: "已保留原始資訊", hasInfo: true },
-      { label: "已完成人工確認", hasInfo: true },
-      { label: "已附上審核紀錄", hasInfo: true },
-    ],
+    evidence,
     blockers: [],
     missingInfo: [],
     whyBlocked: [],
     nextStepAdvice: [],
+    availableIfAllEvidencePasses: evidence.every((item) => item.hasInfo),
   };
 }
 
@@ -141,6 +151,12 @@ export function FlowDecisionCard({ record }: { record: Phase0MessyRecord }) {
           <dt>下一步</dt>
           <dd>{decision.nextStep}</dd>
         </div>
+        {decision.availableIfAllEvidencePasses ? (
+          <div>
+            <dt>額外標記</dt>
+            <dd>流程依據已全部通過，可考慮標註為可接取</dd>
+          </div>
+        ) : null}
       </dl>
 
       <section>

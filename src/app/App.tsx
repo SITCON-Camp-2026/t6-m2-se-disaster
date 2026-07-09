@@ -64,7 +64,7 @@ export function App() {
           <Phase0TaskIntake
             records={phase0Records}
             selectedRecordId={selectedRecordId}
-            onSelect={setSelectedRecordId}
+            onSelect={selectForWorkbench}
           />
         ) : (
           <Phase0Workbench

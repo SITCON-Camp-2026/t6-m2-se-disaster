@@ -321,10 +321,19 @@ button {
 }
 
 .status-needs_review,
-.status-unverified,
 .status-unknown {
   background: #fff3cd;
   color: #8a5a00;
+}
+
+.status-unverified {
+  background: #ffe5cc;
+  color: #b86500;
+}
+
+.status-open {
+  background: #fff1b8;
+  color: #8a6c00;
 }
 
 .status-verified,

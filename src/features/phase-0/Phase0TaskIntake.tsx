@@ -1,6 +1,6 @@
-import { RecordCard } from "../../components/RecordCard";
 import { SourceLabel } from "../../components/SourceLabel";
 import { formatDateTime } from "../../lib/date";
+import { buildFlowDecision } from "./FlowDecisionCard";
 import type { Phase0MessyRecord } from "./phase0-types";
 
 export function Phase0TaskIntake({
@@ -12,12 +12,22 @@ export function Phase0TaskIntake({
   selectedRecordId: string;
   onSelect: (recordId: string) => void;
 }) {
-  const available = records.filter(
-    (record) =>
+  const available = records.filter((record) => {
+    if (record.verificationStatus === "unverified") {
+      return false;
+    }
+
+    if (
       record.verificationStatus === "verified" ||
       record.verificationStatus === "confirmed" ||
       record.verificationStatus === "open"
-  );
+    ) {
+      return true;
+    }
+
+    const decision = buildFlowDecision(record);
+    return decision.availableIfAllEvidencePasses;
+  });
   const unverified = records.filter((record) => record.verificationStatus === "unverified");
   const needsReview = records.filter((record) => record.verificationStatus === "needs_review");
 
