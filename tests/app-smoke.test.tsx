@@ -68,4 +68,14 @@ describe("App", () => {
     expect(screen.getByText("待查核，不代表可派遣")).toBeInTheDocument();
     expect(screen.queryByText("已驗證可執行")).not.toBeInTheDocument();
   });
+
+  it("shows missing information and the reason the item cannot be acted on yet", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
+
+    expect(screen.getByText("關鍵缺漏")).toBeInTheDocument();
+    expect(screen.getByText(/不能直接採取下一步/)).toBeInTheDocument();
+    expect(screen.getByText(/下一步建議/)).toBeInTheDocument();
+  });
 });

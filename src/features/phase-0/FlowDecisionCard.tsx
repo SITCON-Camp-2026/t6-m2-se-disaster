@@ -8,6 +8,9 @@ type FlowDecision = {
   canActDirectly: boolean;
   evidence: Array<{ label: string; hasInfo: boolean }>;
   blockers: string[];
+  missingInfo: string[];
+  whyBlocked: string[];
+  nextStepAdvice: string[];
 };
 
 function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
@@ -32,7 +35,20 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
       ],
       blockers: [
         "來源未查核，例如社群轉錄、口頭轉述或未確認公告",
-        "關鍵缺漏：位置不明、需求不清、聯絡方式缺失",
+        "不應自動轉為派工任務，需先由人確認後再決定",
+      ],
+      missingInfo: [
+        "位置不明",
+        "需求不清",
+        "聯絡方式缺失",
+      ],
+      whyBlocked: [
+        "目前仍無法確認這筆資訊是否可安全採取下一步",
+        "未達可執行門檻，不能直接當作任務",
+      ],
+      nextStepAdvice: [
+        "先補查來源與現場狀況",
+        "確認位置、需求與聯絡方式後再判斷",
       ],
     };
   }
@@ -50,8 +66,21 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
         { label: "聯絡或報到線索", hasInfo: hasContactSignal },
       ],
       blockers: [
-        "關鍵缺漏：地址不完整、受災人數不明、聯絡方式缺失",
+        "關鍵欄位仍需人工確認",
         "不應自動轉為派工任務，需先由人確認後再決定",
+      ],
+      missingInfo: [
+        "地址不完整",
+        "受災人數不明",
+        "聯絡方式缺失",
+      ],
+      whyBlocked: [
+        "目前仍無法確認這筆資訊是否可安全採取下一步",
+        "關鍵資料不足，不能直接當作任務",
+      ],
+      nextStepAdvice: [
+        "先由人確認關鍵欄位後再決定",
+        "若必要，補查現場與來源後再進入候選池",
       ],
     };
   }
@@ -67,6 +96,9 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
       { label: "已附上審核紀錄", hasInfo: true },
     ],
     blockers: [],
+    missingInfo: [],
+    whyBlocked: [],
+    nextStepAdvice: [],
   };
 }
 
@@ -112,6 +144,35 @@ export function FlowDecisionCard({ record }: { record: Phase0MessyRecord }) {
               </span>{" "}
               {item.label}
             </li>
+          ))}
+        </ul>
+      </section>
+
+      <section>
+        <h4>關鍵缺漏</h4>
+        <ul>
+          {decision.missingInfo.length > 0 ? (
+            decision.missingInfo.map((item) => <li key={item}>{item}</li>)
+          ) : (
+            <li>目前沒有明顯缺漏</li>
+          )}
+        </ul>
+      </section>
+
+      <section>
+        <h4>不能直接採取下一步</h4>
+        <ul>
+          {decision.whyBlocked.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section>
+        <h4>下一步建議</h4>
+        <ul>
+          {decision.nextStepAdvice.map((item) => (
+            <li key={item}>{item}</li>
           ))}
         </ul>
       </section>
