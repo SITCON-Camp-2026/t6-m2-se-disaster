@@ -30,6 +30,8 @@
 | 2026-07-09 15:20 | Flow Design | 根據 interview-summary、decisions 與 design checklist，整理 v1 的資訊流程與 Mermaid 圖 | 產生保守版本流程：保留原始資訊、加入人工確認與暫時不採用分支、明確留下判斷紀錄 | 採用（草稿） | 這版流程避免把未確認資訊當成已確認，並把「不能自動處理」與「需要人工確認」分開；後續仍需確認可行動門檻與誰有權標記為已驗證 | release-packs/02-flow-design-kit/docs/flow.md |
 | 2026-07-09 16:40 | Frontend Implementation | 根據流程圖把 Phase 0 工作台改成保守流程工作台，顯示「候選任務卡（待查核）」與「需要人工確認」 | 建議把未查核資料維持在待查核狀態，不把它們標成可派遣或已驗證 | 採用 | 這版 UI 只呈現流程狀態，不做自動派遣或自動補全；避免使用者把未確認資訊誤解為可執行任務 | src/features/phase-0/FlowDecisionCard.tsx, src/features/phase-0/Phase0Workbench.tsx, tests/app-smoke.test.tsx |
 | 2026-07-09 17:10 | Documentation | 把「行動者」persona 的 sub-agent 回饋整理成可直接查看的文件，放進 docs/ | 以 Actor persona 的固定格式整理出對目前工作台的安全性與可執行性回饋 | 採用（文件草稿） | 這份文件保留了使用者視角，重點是哪些資訊不能直接作為行動依據，避免把未確認內容誤當為已確認 | docs/actor-feedback.md |
+| 2026-07-09 17:25 | Documentation | 根據再次訪問網頁的實際回饋，補充 Actor persona 回饋文件的「再次訪問回饋」區塊 | 加入具體瀏覽感受與對現有工作台提示需求的回饋 | 採用 | 這次回饋強調「候選任務 vs 已查核」的界線、來源與查核狀態提示、以及 Phase 0 原型提醒 | docs/actor-feedback.md |
+| 2026-07-09 17:40 | Documentation | 第二次訪問網頁後，補充 Actor persona 回饋文件尾端的「第二次訪問回饋」 | 再次整理瀏覽後的使用者疑慮與安全性提醒需求 | 採用 | 這次補充再次強調現有工作台應加強「這不是最終任務」與「資料階段性提示」 | docs/actor-feedback.md |
 
 ## 範例
 

@@ -271,6 +271,28 @@ button {
   line-height: 1.7;
 }
 
+.flow-card__prototype {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #9f4d1d;
+  font-weight: 700;
+}
+
+.phase0-intake__notice {
+  border: 1px solid #cfe0ff;
+  background: #eef6ff;
+  color: #1f4a8a;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.intake-section__stage {
+  margin: 8px 0 0;
+  color: #5f6b7a;
+  font-size: 0.95rem;
+}
+
 .flow-marker {
   display: inline-flex;
   align-items: center;

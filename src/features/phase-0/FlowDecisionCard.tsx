@@ -3,6 +3,7 @@ import type { Phase0MessyRecord } from "./phase0-types";
 
 type FlowDecision = {
   statusLabel: string;
+  stageLabel: string;
   detail: string;
   nextStep: string;
   canActDirectly: boolean;
@@ -25,6 +26,7 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
   if (record.verificationStatus === "unverified") {
     return {
       statusLabel: "候選任務卡（待查核）",
+      stageLabel: "待查核階段",
       detail: "待查核，不代表可派遣",
       nextStep: "由人類確認是否進入候選池",
       canActDirectly: false,
@@ -56,6 +58,7 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
   if (record.verificationStatus === "needs_review") {
     return {
       statusLabel: "需要人工確認",
+      stageLabel: "待人工確認階段",
       detail: "關鍵欄位仍需人工判斷，不能直接當成可執行任務",
       nextStep: "先保留原始資訊，再由人類補查",
       canActDirectly: false,
@@ -87,6 +90,7 @@ function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
 
   return {
     statusLabel: "已驗證可執行",
+    stageLabel: "已驗證階段",
     detail: "已通過人類確認，並保留審核紀錄",
     nextStep: "可進入後續任務流程",
     canActDirectly: true,
@@ -116,8 +120,15 @@ export function FlowDecisionCard({ record }: { record: Phase0MessyRecord }) {
       </div>
 
       <p>{decision.detail}</p>
+      <p className="flow-card__prototype">
+        提醒：這不是最終任務，重點在呈現資料品質與查核階段。
+      </p>
 
       <dl className="judgement-summary">
+        <div>
+          <dt>目前階段</dt>
+          <dd>{decision.stageLabel}</dd>
+        </div>
         <div>
           <dt>原始資訊</dt>
           <dd>已保留</dd>
