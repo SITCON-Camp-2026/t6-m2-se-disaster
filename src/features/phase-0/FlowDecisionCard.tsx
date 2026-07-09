@@ -16,13 +16,17 @@ type FlowDecision = {
 };
 
 export function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
-  const hasLocationSignal = /(地址|位置|出口|集合點|老街|車站|學校|路口|活動中心|溪畔|光復|大進路口)/i.test(
+  const hasLocationSignal =
+    /(地址|位置|出口|集合點|老街|車站|學校|路口|活動中心|溪畔|光復|大進路口)/i.test(
+      record.rawText,
+    );
+  const hasNeedSignal =
+    /(需要|需求|缺|支援|協助|收|剩|不缺|水電|雨鞋|泥水|家具|清泥)/i.test(
+      record.rawText,
+    );
+  const hasContactSignal = /(聯絡|電話|來電|志工|報到|值守)/i.test(
     record.rawText,
   );
-  const hasNeedSignal = /(需要|需求|缺|支援|協助|收|剩|不缺|水電|雨鞋|泥水|家具|清泥)/i.test(
-    record.rawText,
-  );
-  const hasContactSignal = /(聯絡|電話|來電|志工|報到|值守)/i.test(record.rawText);
 
   if (record.verificationStatus === "unverified") {
     const evidence = [
@@ -42,11 +46,7 @@ export function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
         "來源未查核，例如社群轉錄、口頭轉述或未確認公告",
         "不應自動轉為派工任務，需先由人確認後再決定",
       ],
-      missingInfo: [
-        "位置不明",
-        "需求不清",
-        "聯絡方式缺失",
-      ],
+      missingInfo: ["位置不明", "需求不清", "聯絡方式缺失"],
       whyBlocked: [
         "目前仍無法確認這筆資訊是否可安全採取下一步",
         "未達可執行門檻，不能直接當作任務",
@@ -78,11 +78,7 @@ export function buildFlowDecision(record: Phase0MessyRecord): FlowDecision {
         "關鍵欄位仍需人工確認",
         "不應自動轉為派工任務，需先由人確認後再決定",
       ],
-      missingInfo: [
-        "地址不完整",
-        "受災人數不明",
-        "聯絡方式缺失",
-      ],
+      missingInfo: ["地址不完整", "受災人數不明", "聯絡方式缺失"],
       whyBlocked: [
         "目前仍無法確認這筆資訊是否可安全採取下一步",
         "關鍵資料不足，不能直接當作任務",
@@ -165,7 +161,11 @@ export function FlowDecisionCard({ record }: { record: Phase0MessyRecord }) {
           {decision.evidence.map((item) => (
             <li key={item.label}>
               <span
-                className={item.hasInfo ? "flow-marker flow-marker--ok" : "flow-marker flow-marker--warn"}
+                className={
+                  item.hasInfo
+                    ? "flow-marker flow-marker--ok"
+                    : "flow-marker flow-marker--warn"
+                }
               >
                 {item.hasInfo ? "✓" : "✗"}
               </span>{" "}
