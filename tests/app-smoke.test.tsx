@@ -45,17 +45,27 @@ describe("App", () => {
     expect(screen.getAllByText("未查核").length).toBeGreaterThan(0);
   });
 
-  it("keeps draft CRUD as learner work instead of starter output", () => {
+  it("shows the conservative workflow board rules", () => {
     render(<App />);
 
     fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
 
-    expect(screen.getByText("尚未建立整理草稿")).toBeInTheDocument();
-    expect(
-      screen.getByText(/請 agent 加上建立、編輯、刪除或重設整理草稿/),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/已產生 \d+ 筆安全邊界草稿/),
-    ).not.toBeInTheDocument();
+    expect(screen.getByText("流程工作台")).toBeInTheDocument();
+    expect(screen.getByText("流程規則")).toBeInTheDocument();
+    expect(screen.getByText(/候選任務卡/)).toBeInTheDocument();
+    expect(screen.getByText(/不代表可派遣/)).toBeInTheDocument();
+    expect(screen.getByText("M-004")).toBeInTheDocument();
+    expect(screen.queryByText("已驗證可執行")).not.toBeInTheDocument();
+  });
+
+  it("keeps unverified items pending instead of treating them as deployable", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "整理工作台" }));
+    fireEvent.click(screen.getByRole("button", { name: /M-004/ }));
+
+    expect(screen.getByText("候選任務卡（待查核）")).toBeInTheDocument();
+    expect(screen.getByText("待查核，不代表可派遣")).toBeInTheDocument();
+    expect(screen.queryByText("已驗證可執行")).not.toBeInTheDocument();
   });
 });

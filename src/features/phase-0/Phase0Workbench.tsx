@@ -1,7 +1,6 @@
 import { RecordCard } from "../../components/RecordCard";
 import { StatusBadge } from "../../components/StatusBadge";
-import { Phase0JudgementCard } from "./Phase0JudgementCard";
-import { createPhase0Judgement } from "./phase0-heuristics";
+import { FlowDecisionCard } from "./FlowDecisionCard";
 import type { Phase0MessyRecord } from "./phase0-types";
 
 export function Phase0Workbench({
@@ -15,7 +14,6 @@ export function Phase0Workbench({
 }) {
   const selectedRecord =
     records.find((record) => record.id === selectedRecordId) ?? records[0];
-  const safetyBoundary = createPhase0Judgement(selectedRecord);
 
   return (
     <div className="workbench">
@@ -23,8 +21,7 @@ export function Phase0Workbench({
         <p className="eyebrow">整理工作台</p>
         <h2>第一階段的成功不是分類正確，而是把為什麼現在還不能判斷說清楚。</h2>
         <p>
-          這裡先只標示安全邊界，真正的候選判斷要由小組和 coding agent
-          補上；這不是 runtime LLM 分析，也不是正式資料模型。
+          這版流程工作台只把資訊分成待查核、需要人工確認與已驗證可執行三種狀態，不把未查核資訊當成可派遣任務。
         </p>
       </div>
 
@@ -46,22 +43,17 @@ export function Phase0Workbench({
         <div className="workbench__main">
           <RecordCard record={selectedRecord} />
 
-          <Phase0JudgementCard
-            judgement={safetyBoundary}
-            record={selectedRecord}
-          />
+          <FlowDecisionCard record={selectedRecord} />
         </div>
 
         <aside className="workbench__checklist">
-          <h3>第一階段完成檢查</h3>
+          <h3>流程規則</h3>
           <ul>
-            <li>Starter 已載入 {records.length} 筆原始資訊</li>
-            <li>請 agent 加上建立、編輯、刪除或重設整理草稿</li>
-            <li>至少讓 6 筆原始資訊被嘗試整理成可編輯草稿</li>
-            <li>至少挑 2 個候選判斷由人類質疑或修正</li>
-            <li>
-              把資料品質問題寫進 observations，並記錄 agent 哪裡不能直接相信
-            </li>
+            <li>保留原始資訊與來源，不把它當成已確認事實</li>
+            <li>關鍵欄位缺漏時，標記為需要人工確認</li>
+            <li>候選任務卡（待查核）不代表可派遣</li>
+            <li>每次判斷都留下原因與紀錄</li>
+            <li>未查核資料不會被標成可執行任務</li>
           </ul>
         </aside>
       </div>
